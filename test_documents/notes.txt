@@ -1,0 +1,3 @@
+python is easy to learn
+i am building smart document intellegince
+this is my first document
