@@ -55,6 +55,67 @@ def text_docx(file):
 
     return "\n".join(content)
 
+def file_details(file):
+        if not file.exists() or not file.is_file():
+            print("File not found")
+            return
+        supported_extensions = {".pdf", ".docx", ".txt"}
+        extension = file.suffix.lower()
+        paragraph="N/A"    
+        pages="N/A"    
+
+                
+        if extension == ".txt":
+            text = text_txt(file)
+            words=len(text.split())
+            characters=len(text)
+        elif extension == ".pdf":
+            text = text_pdf(file)
+            words=len(text.split())
+            characters=len(text)
+            doc=fitz.open(file)
+            pages=len(doc)
+            doc.close()
+
+                
+        elif extension == ".docx":
+            text = text_docx(file)
+            words=len(text.split())
+            characters=len(text)
+            doc=Document(file)
+            paragraph=len(doc.paragraphs)
+
+        
+        if file.suffix.lower() in supported_extensions:
+                        details=({
+                            "name": file.name,
+                            "extension": file.suffix.lower(),
+                            "size": format_file_size(file.stat().st_size),
+                            "modified": modified_time(file.stat().st_mtime),
+                            "Words":words,
+                            "characters":characters,
+                            "paragraphs":paragraph,
+                            "pages":pages})
+
+      
+
+        print("\n--------------------")
+        print("Name:", details["name"])
+        print("Type:", details["extension"])
+        print("Size:", details["size"])
+        print("Modified:", details["modified"])
+        print("Words:", details["Words"])
+        print("Characters:", details["characters"])
+        print("Paragraphs:", details["paragraphs"])
+        print("Pages:", details["pages"])
+
+
+
+
+
+  
+        
+        
 
 def scan_documents(folder_path):
 
@@ -102,9 +163,9 @@ folder_path = input("Enter documents folder path: ")
 while True:
 
     print("\n===== SmartDocumentIntelligence =====")
-    print("1. View Documents")
+    print("1. View Folder  Documents")
     print("2. View File Content")
-    print("3. View Folder Details")
+    print("3. View File Details")
     print("4. Exit")
 
     choice = input("Enter your choice: ")
@@ -140,7 +201,10 @@ while True:
         print(text)
 
     elif choice == "3":
-        print("Folder Details feature will be added soon.")
+        print("====File Details====")
+        f_name=input("Enter File Name:")
+        file=Path(folder_path)/f_name
+        file_details(file)
 
     elif choice == "4":
         print("Exiting SmartDocumentIntelligence...")
