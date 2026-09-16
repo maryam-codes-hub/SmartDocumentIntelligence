@@ -55,39 +55,48 @@ def text_docx(file):
 
     return "\n".join(content)
 
+def extract_text(file):
+    extension = file.suffix.lower()
+
+    if extension == ".txt":
+            text = text_txt(file)
+
+    elif extension == ".pdf":
+            text = text_pdf(file)
+
+    elif extension == ".docx":
+            text = text_docx(file)
+
+    else:
+        return None
+    return text
+
 def file_details(file):
         if not file.exists() or not file.is_file():
             print("File not found")
             return
-        supported_extensions = {".pdf", ".docx", ".txt"}
         extension = file.suffix.lower()
         paragraph="N/A"    
-        pages="N/A"    
+        pages="N/A" 
+        text=extract_text(file)
+        if text is None:
+             print("unable to extract text")   
+             return
 
                 
-        if extension == ".txt":
-            text = text_txt(file)
-            words=len(text.split())
-            characters=len(text)
-        elif extension == ".pdf":
-            text = text_pdf(file)
-            words=len(text.split())
-            characters=len(text)
+        words=len(text.split())
+        characters=len(text)
+        if extension == ".pdf":
             doc=fitz.open(file)
             pages=len(doc)
             doc.close()
 
                 
-        elif extension == ".docx":
-            text = text_docx(file)
-            words=len(text.split())
-            characters=len(text)
+        if extension == ".docx":
             doc=Document(file)
             paragraph=len(doc.paragraphs)
 
-        
-        if file.suffix.lower() in supported_extensions:
-                        details=({
+        details=({
                             "name": file.name,
                             "extension": file.suffix.lower(),
                             "size": format_file_size(file.stat().st_size),
@@ -109,12 +118,7 @@ def file_details(file):
         print("Paragraphs:", details["paragraphs"])
         print("Pages:", details["pages"])
 
-
-
-
-
   
-        
         
 
 def scan_documents(folder_path):
@@ -175,30 +179,25 @@ while True:
 
     elif choice == "2":
 
-        file_name = input("Enter file path: ")
-        file = Path(folder_path)/file_name
+      f_name = input("Enter File Name: ")
+      file = Path(folder_path) / f_name
 
-        if not file.exists() or not file.is_file():
-            print("File not found.")
-            continue
+      if not file.exists() or not file.is_file():
+        print("File not found.")
+        continue
 
-        extension = file.suffix.lower()
+      text = extract_text(file)
 
-        if extension == ".txt":
-            text = text_txt(file)
+      if text is None:
+        print("Unsupported file type.")
+        continue
 
-        elif extension == ".pdf":
-            text = text_pdf(file)
+      print("\n========== FILE CONTENT ==========")
+      print(text)
 
-        elif extension == ".docx":
-            text = text_docx(file)
+        
+       
 
-        else:
-            print("Unsupported file type.")
-            continue
-
-        print("\n========== FILE CONTENT ==========")
-        print(text)
 
     elif choice == "3":
         print("====File Details====")
